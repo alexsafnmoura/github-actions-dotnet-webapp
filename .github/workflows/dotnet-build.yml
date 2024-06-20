@@ -1,26 +1,24 @@
 name: github-actions .NET
 
 on:
+  push:
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
   schedule:
-    - cron: '0 0 * * 1'
+  - cron: '0 0 * * 1'
 
 jobs:
-  intall:
-    name: Installing Packages
-    runs-on: ubuntu-latest
+  build:
+   runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Cache node_modules
-        uses: actions/cache@v2
-        with:
-            path: node_modules
-            key: ${{ runner.os}}-${{ hashFiles('**/yarn.lock')}}
-
-      - name: Install dependencies
-        run: yarn install
+   steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies
+      run: dotnet restore **/*.csproj
+    - name: Build
+      run: dotnet build **/*.csproj --no-restore

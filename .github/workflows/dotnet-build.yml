@@ -3,27 +3,24 @@ name: github-actions .NET
 on:
   pull_request:
     branches: [ "main" ]
-    
+
   schedule:
     - cron: '0 0 * * 1'
 
 jobs:
-  build:
+  intall:
+    name: Installing Packages
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Cache node_modules
+        uses: actions/cache@v2
         with:
-          dotnet-version: 8.0.x
-      - name: Restore dependencies
-        run: dotnet restore **/*.csproj
-      - name: Build
-        run: dotnet build **/*.csproj --no-restore
+            path: node_modules
+            key: ${{ runner.os}}-${{ hashFiles('**/yarn.lock')}}
 
-      - name: Executar testes unitários
-        run: dotnet test
-
-      - name: Compilar o WebApp
-        run: dotnet build --no-restore
+      - name: Install dependencies
+        run: yarn install
